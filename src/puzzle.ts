@@ -412,7 +412,7 @@ function trySolveBoardWithKnownGroups(board: Board, groups: number, cellsPerGrou
     return trySolve([], []);
 }
 
-function winnerFor(board: Board, group: Group): number | null {
+export function winnerFor(board: Board, group: Group): number | null {
     let votes = Array(Math.max(...board.flat()) + 1).fill(0);
     for (let [x, y] of group) {
         votes[board[y][x]]++;

@@ -2,7 +2,7 @@ import {ArrowBack, ArrowForward} from "@suid/icons-material";
 import {Alert, Box, Button, Card, CircularProgress, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton, ToggleButton, Toolbar, useTheme} from "@suid/material";
 import {For, Index, Show, createEffect, createSignal, onCleanup, onMount} from "solid-js";
 import {COLOURS, HIGHLIGHT_COLOURS} from "./colours";
-import {Board, Group, PuzzleData, serialise, validatePuzzleSolution} from "./puzzle";
+import {Board, Group, PuzzleData, serialise, validatePuzzleSolution, winnerFor} from "./puzzle";
 import CheatWorker from "./workers/cheatWorker?worker";
 
 const PATTERNS = ["semi-transparent", "ur", "dr", "x"];
@@ -289,12 +289,38 @@ export function PlayPuzzle(props: PlayPuzzleProps) {
         }
     });
 
+    const groupVotes = () => groups()
+        .map(group => winnerFor(props.data.board, group))
+        .reduce((acc, winner) => winner != null
+            ? (acc[winner]++, acc)
+            : acc,
+            Array(Math.max(...props.data.board.flat()) + 1).fill(0)
+        );
+
     return <>
         <CheatDialogue open={cheatOpen()} onClose={maybeCheat} />
-        <Box sx={{height: 50}}>
+        <Box sx={{height: 50, mb: 2}}>
             <Show when={won()}>
-                <Alert sx={{mb: 1}} severity="success" variant="filled">You have completed this puzzle!</Alert>
+                <Alert severity="success" variant="filled">You have completed this puzzle!</Alert>
             </Show>
+        </Box>
+        Make {{cmy: "Cyan", rgb: "Red", rby: "Red"}[props.puzzleColours]} win!
+        <Box sx={{
+            display: "flex",
+            flexDirection: "row",
+            flexWrap: "wrap",
+            gap: 2,
+            padding: 2,
+        }}>
+            <Index each={groupVotes()}>{(votes, i) => (
+                <span>
+                    {{
+                        cmy: ["Cyan", "Magenta", "Yellow", "Red", "Green", "Blue"][i],
+                        rgb: ["Red", "Green", "Blue", "Cyan", "Magenta", "Yellow"][i],
+                        rby: ["Red", "Blue", "Yellow", "Magenta", "Cyan", "Green"][i],
+                    }[props.puzzleColours]}: {votes()}
+                </span>
+            )}</Index>
         </Box>
         <Box sx={{
             display: "flex",
@@ -308,7 +334,7 @@ export function PlayPuzzle(props: PlayPuzzleProps) {
                 lg: 800,
                 xl: 1200,
             },
-            padding: {
+            px: {
                 xs: 2,
                 sm: 4,
                 md: 2,
