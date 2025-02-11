@@ -155,17 +155,14 @@ export function PuzzleDesigner(props: PageProps<{
         </Dialog>
         <Box sx={{
             display: "flex",
-            flexDirection: {
-                xs: "column",
-                md: "row",
-            },
+            flexDirection: "row",
             maxWidth: {
                 xs: "100%",
                 md: 620,
                 lg: 800,
                 xl: 1200,
             },
-            padding: {
+            px: {
                 xs: 2,
                 sm: 4,
                 md: 2,
@@ -206,16 +203,46 @@ export function PuzzleDesigner(props: PageProps<{
                 </Show>
             </Button>
         </Box>
-        <Button
-            variant="contained"
-            component="a"
-            href={`https://github.com/Starwort/gerrymandering/issues/new?assignees=Starwort&labels=puzzle-submission&projects=&template=puzzle.yml&title=%5BCustom+puzzle%5D+&puzzle-url=${encodeURIComponent(url())}`}
-            target="_blank"
-            endIcon={<Launch />}
-            disabled={!validationResult().length}
-        >
-            Submit this puzzle
-        </Button>
+        <Box sx={{
+            display: "flex",
+            flexDirection: "row",
+            maxWidth: {
+                xs: "100%",
+                md: 620,
+                lg: 800,
+                xl: 1200,
+            },
+            px: {
+                xs: 2,
+                sm: 4,
+                md: 2,
+            },
+            my: 2,
+            width: '100%',
+            justifyContent: "center",
+            alignItems: "center",
+            gap: 2,
+        }}>
+            <Button
+                variant="contained"
+                component="a"
+                href={`https://github.com/Starwort/gerrymandering/issues/new?assignees=Starwort&labels=puzzle-submission&projects=&template=puzzle.yml&title=%5BCustom+puzzle%5D+&puzzle-url=${encodeURIComponent(url())}`}
+                target="_blank"
+                endIcon={<Launch />}
+                disabled={!validationResult().length}
+            >
+                Submit this puzzle
+            </Button>
+            <Button
+                variant="contained"
+                component="a"
+                href={url()}
+                target="_blank"
+                endIcon={<Launch />}
+            >
+                Try this puzzle
+            </Button>
+        </Box>
         <Box sx={{
             display: "flex",
             flexDirection: {
@@ -228,7 +255,7 @@ export function PuzzleDesigner(props: PageProps<{
                 lg: 800,
                 xl: 1200,
             },
-            padding: {
+            px: {
                 xs: 2,
                 sm: 4,
                 md: 2,
