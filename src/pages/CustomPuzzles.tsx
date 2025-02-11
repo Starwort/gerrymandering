@@ -62,7 +62,7 @@ export function CustomPuzzles(props: PageProps) {
                                 }}
                             >
                                 <Show
-                                    when={localStorage[puzzleDesc + "won"] == "true"}
+                                    when={localStorage["GM_" + puzzleDesc + "won"] == "true"}
                                     fallback={<ListItemText primary={name} inset />}
                                 >
                                     <ListItemIcon>
