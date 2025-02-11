@@ -40,21 +40,47 @@ export function InfoDialogue(props: InfoDialogueProps) {
             </Typography>
             <Typography sx={{mb: 1}}>
                 Original puzzle by <Link
+                    target="_blank"
                     href="https://www.youtube.com/@v.deckard"
-                >Deckard</Link>; check out their two videos <Typography component={Link} href="https://www.youtube.com/watch?v=WQQrFOgRjDg" sx={{fontStyle: "italic"}}>
+                >Deckard</Link>; check out their two videos <Typography
+                    component={Link}
+                    href="https://www.youtube.com/watch?v=WQQrFOgRjDg"
+                    sx={{fontStyle: "italic"}}
+                    target="_blank"
+                >
                     Let's turn Gerrymandering into a puzzle genre!
-                </Typography> and <Typography component={Link} href="https://www.youtube.com/watch?v=SvdJWcijn4M" sx={{fontStyle: "italic"}}>
+                </Typography> and <Typography
+                    component={Link}
+                    href="https://www.youtube.com/watch?v=SvdJWcijn4M"
+                    sx={{fontStyle: "italic"}}
+                    target="_blank"
+                >
                     Gerrymandering Math & Puzzles with three colours of districts! (Part 2)
                 </Typography>.
             </Typography>
             <Typography>
-                Implementation by <Link href="https://github.com/Starwort">Starwort</Link>.
+                Implementation by <Link
+                    target="_blank"
+                    href="https://github.com/Starwort"
+                >Starwort</Link>.
             </Typography>
             <Box sx={{display: "flex", justifyContent: "center", gap: 2, paddingTop: 2}}>
-                <Button href="https://ko-fi.com/starwort" startIcon={<Kofi />} variant="contained">
+                <Button
+                    component="a"
+                    href="https://ko-fi.com/starwort"
+                    startIcon={<Kofi />}
+                    variant="contained"
+                    target="_blank"
+                >
                     Support me on Ko-fi
                 </Button>
-                <Button href="https://github.com/Starwort/gerrymandering/" startIcon={<GitHub />} variant="contained">
+                <Button
+                    component="a"
+                    href="https://github.com/Starwort/gerrymandering/"
+                    startIcon={<GitHub />}
+                    variant="contained"
+                    target="_blank"
+                >
                     View source on GitHub
                 </Button>
             </Box>

@@ -228,6 +228,7 @@ export default function App() {
                     <ListItemButton
                         component="a"
                         href="https://ko-fi.com/starwort"
+                        target="_blank"
                     >
                         <ListItemIcon>
                             <Heart />
@@ -239,6 +240,7 @@ export default function App() {
                     <ListItemButton
                         component="a"
                         href="https://github.com/Starwort/gerrymandering/"
+                        target="_blank"
                     >
                         <ListItemIcon>
                             <GitHub />
