@@ -157,8 +157,8 @@ function generatePathForGroup(group: Group): string {
 
 const worker = new CheatWorker();
 
-export async function CHEAT(board: Board): Promise<Group[]> {
-    return new Promise((resolve, reject) => {
+export async function CHEAT(board: Board | number): Promise<Group[]> {
+    return new Promise((resolve) => {
         const nonce = Math.random();
         worker.onmessage = (event: MessageEvent<{
             solution: Group[];
@@ -251,12 +251,14 @@ export function PlayPuzzle(props: PlayPuzzleProps) {
     const [processingCheat, setProcessingCheat] = createSignal(false);
 
     const cheat = () => {
-        setProcessingCheat(true);
-        CHEAT(props.data.board).then(answer => {
-            setWon(true);
-            setGroups(answer);
-            setProcessingCheat(false);
-        });
+        if (props.data.generatedFromSeed) {
+            setProcessingCheat(true);
+            CHEAT(props.data.randomSeed).then(answer => {
+                setWon(true);
+                setGroups(answer);
+                setProcessingCheat(false);
+            });
+        }
     };
 
     const [highlightMode, setHighlightMode] = createSignal<'erase' | 'draw'>('draw');
@@ -375,7 +377,7 @@ export function PlayPuzzle(props: PlayPuzzleProps) {
             >
                 Clear all
             </Button>
-            <Show when={false}>
+            <Show when={props.data.generatedFromSeed}>
                 <Button
                     onClick={maybeConfirmCheat}
                     variant="contained"

@@ -135,12 +135,12 @@ function fillGroups(groups: Group[], board: Board, nColours: number, random: Ran
     }
 }
 
-// export function CHEAT(seed: number) {
-//     const random = makeRandom(seed);
-//     const [[x, y], nColours] = choosePuzzleParams(random);
-//     const [nGroups, cellsPerGroup] = optimiseMinorityCells(x * y, nColours);
-//     return generateGroups(x, y, nGroups, cellsPerGroup, random);
-// }
+export function CHEAT(seed: number) {
+    const random = makeRandom(seed);
+    const [[x, y], nColours] = choosePuzzleParams(random);
+    const [nGroups, cellsPerGroup] = optimiseMinorityCells(x * y, nColours);
+    return generateGroups(x, y, nGroups, cellsPerGroup, random);
+}
 
 function generatePuzzle([x, y]: [number, number], nGroups: number, nColours: number, cellsPerGroup: number, random: Random): Board {
     let board = Array(y).fill(0).map(() => Array(x).fill(-1));
