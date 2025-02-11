@@ -121,7 +121,7 @@ export function PuzzleDesigner(props: PageProps<{
                     for (let i = 0; i < 6; i++) {
                         ordered[i] = cellQtys.indexOf(ordered[i]);
                     }
-                    setBoard(board => board.map(row => row.map(cell => ordered[cell])));
+                    setBoard(board => board.map(row => row.map(cell => ordered.indexOf(cell))));
                 }}>
                     Fix it
                 </Button>
