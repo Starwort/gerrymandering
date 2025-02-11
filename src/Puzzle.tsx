@@ -291,9 +291,11 @@ export function PlayPuzzle(props: PlayPuzzleProps) {
 
     return <>
         <CheatDialogue open={cheatOpen()} onClose={maybeCheat} />
-        <Show when={won()}>
-            <Alert sx={{mb: 1}} severity="success" variant="filled">You have completed this puzzle!</Alert>
-        </Show>
+        <Box sx={{height: 50}}>
+            <Show when={won()}>
+                <Alert sx={{mb: 1}} severity="success" variant="filled">You have completed this puzzle!</Alert>
+            </Show>
+        </Box>
         <Box sx={{
             display: "flex",
             flexDirection: {
