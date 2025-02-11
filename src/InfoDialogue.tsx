@@ -9,27 +9,46 @@ export function InfoDialogue(props: InfoDialogueProps) {
     return <Dialog {...props}>
         <DialogTitle>About</DialogTitle>
         <DialogContent>
-            {/* <Typography>
-                Tangleword is a word puzzle game, where several crossword-style clues
-                each point to a vertical column. The answer to each clue is a three-letter
-                word, made up of the three letters that the clue points to.
-            </Typography>
-            <br />
-            <Typography>
-                The game is won when all the letters on the right-hand side of the
-                screen are filled in correctly, without causing any conflicts.
-            </Typography>
-            <br />
-            <Typography>
-                For convenience, an additional view is provided that shows the
-                letters in a grid. This may be easier to read for some people.
-            </Typography>
-            <br /> */}
-            <Typography>
-                This implementation of Gerrymandering was created by Starwort,
-                based on the puzzle as described by <Link
+            <Typography sx={{mb: 1}}>
+                This is a digital version of <Link
                     href="https://www.youtube.com/@v.deckard"
-                >Deckard</Link> in their two <Link href="https://www.youtube.com/watch?v=WQQrFOgRjDg">YouTube</Link> <Link href="https://www.youtube.com/watch?v=SvdJWcijn4M">Videos</Link>.
+                >Deckard</Link>'s Gerrymandering puzzle as initially described
+                in <Typography component={Link} href="https://www.youtube.com/watch?v=WQQrFOgRjDg" sx={{fontStyle: "italic"}}>
+                    Let's turn Gerrymandering into a puzzle genre!
+                </Typography>.
+            </Typography>
+            <Typography sx={{mb: 1}}>
+                The goal is to divide the grid into equal-size districts, such
+                that the minority colour (in the default colour scheme, Cyan)
+                wins the majority of the districts.
+            </Typography>
+            <Typography sx={{mb: 1}}>
+                Ties for first place are not allowed; ties for second place or
+                below are allowed (and may be required). This is true both at
+                district-level and overall.
+            </Typography>
+            <Typography sx={{mb: 1}}>
+                Click and drag to form districts. Click on a cell that is already
+                part of the current district colour to remove it from the district.
+            </Typography>
+            <Typography sx={{mb: 1}}>
+                Choose which district to form using the panel of buttons. There
+                are eight pages of ten colours (twenty colours and 4 patterns)
+                to choose from; pages can be navigated using either the arrow
+                buttons or the keys A-H, and colours can be selected by clicking
+                their button or using the numbers 0-9.
+            </Typography>
+            <Typography sx={{mb: 1}}>
+                Original puzzle by <Link
+                    href="https://www.youtube.com/@v.deckard"
+                >Deckard</Link>; check out their two videos <Typography component={Link} href="https://www.youtube.com/watch?v=WQQrFOgRjDg" sx={{fontStyle: "italic"}}>
+                    Let's turn Gerrymandering into a puzzle genre!
+                </Typography> and <Typography component={Link} href="https://www.youtube.com/watch?v=SvdJWcijn4M" sx={{fontStyle: "italic"}}>
+                    Gerrymandering Math & Puzzles with three colours of districts! (Part 2)
+                </Typography>.
+            </Typography>
+            <Typography>
+                Implementation by <Link href="https://github.com/Starwort">Starwort</Link>.
             </Typography>
             <Box sx={{display: "flex", justifyContent: "center", gap: 2, paddingTop: 2}}>
                 <Button href="https://ko-fi.com/starwort" startIcon={<Kofi />} variant="contained">
