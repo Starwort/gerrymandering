@@ -1,8 +1,40 @@
-import {Random, makeRandom, shuffle} from "./random";
+import {Random, makeRandom, select, shuffle, weightedChoice} from "./random";
+
+const sizesByDifficulty = [
+    // very easy
+    [3, 4],
+    // easy
+    [4, 5, 6],
+    // medium
+    [6, 7, 8],
+    // hard
+    [8, 9, 10],
+    // very hard
+    [10, 12, 14],
+];
+
+const colourWeightsByDifficulty = [
+    // very easy
+    [0, 10, 1, 0, 0, 0],
+    // easy
+    [0, 5, 1, 0, 0, 0],
+    // medium
+    [0, 1, 10, 3, 0, 0],
+    // hard
+    [0, 0, 5, 2, 1, 0],
+    // very hard
+    [0, 0, 5, 5, 2, 1],
+];
 
 function choosePuzzleParams(random: Random): [[number, number], number] {
     // todo: different difficulties
-    return [[7, 7], 2];
+    const difficulty = weightedChoice([
+        1, 2, 3, 2, 1,
+    ], random);
+    const sizeX = select(sizesByDifficulty[difficulty], random);
+    const sizeY = select(sizesByDifficulty[difficulty], random);
+    const nColours = weightedChoice(colourWeightsByDifficulty[difficulty], random) + 1;
+    return [[sizeX, sizeY], nColours];
 }
 
 function generateGroups(x: number, y: number, nGroups: number, cellsPerGroup: number, random: Random): Group[] {
