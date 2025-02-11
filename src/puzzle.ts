@@ -25,12 +25,28 @@ const colourWeightsByDifficulty = [
     // very hard
     [0, 0, 5, 5, 2, 1],
 ];
+const difficultyWeights = [
+    1, 2, 3, 2, 1,
+];
+
+export function puzzleDifficulty(seed: number): string {
+    const random = makeRandom(seed);
+    const difficulty = weightedChoice(difficultyWeights, random);
+    const sizeX = select(sizesByDifficulty[difficulty], random);
+    const sizeY = select(sizesByDifficulty[difficulty], random);
+    const nColours = weightedChoice(colourWeightsByDifficulty[difficulty], random) + 1;
+    return [
+        "a Very Easy",
+        "an Easy",
+        "a Medium",
+        "a Hard",
+        "a Very Hard",
+    ][difficulty] + ` (${sizeX}×${sizeY}, ${nColours} colours)`;
+}
 
 function choosePuzzleParams(random: Random): [[number, number], number] {
     // todo: different difficulties
-    const difficulty = weightedChoice([
-        1, 2, 3, 2, 1,
-    ], random);
+    const difficulty = weightedChoice(difficultyWeights, random);
     const sizeX = select(sizesByDifficulty[difficulty], random);
     const sizeY = select(sizesByDifficulty[difficulty], random);
     const nColours = weightedChoice(colourWeightsByDifficulty[difficulty], random) + 1;

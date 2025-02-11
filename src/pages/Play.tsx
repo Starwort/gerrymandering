@@ -2,7 +2,7 @@ import {BarChart, Share} from "@suid/icons-material";
 import {Box, Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Typography} from "@suid/material";
 import {Accessor, JSXElement, Show, createEffect, createResource, createSignal} from "solid-js";
 import {PlayPuzzle} from "../Puzzle";
-import {PuzzleData, serialise} from "../puzzle";
+import {PuzzleData, puzzleDifficulty, serialise} from "../puzzle";
 import {loadNumFromStorage} from "../util";
 import PuzzleGenWorker from "../workers/puzzleGenWorker?worker";
 import {PageProps} from "./PageProps";
@@ -38,6 +38,21 @@ export function Play(props: PageProps<{
             worker.postMessage(query.toString());
         }),
     );
+    const seed = () => {
+        const query = props.query();
+        let randomSeed: number;
+        if (query.has("seed")) {
+            randomSeed = parseInt(query.get("seed")!);
+            if (isNaN(randomSeed)) {
+                postMessage({kind: 'error', error: "Invalid seed"});
+                window.history.replaceState(null, "", window.location.pathname);
+                randomSeed = Math.floor(new Date() as any / 8.64e7);
+            }
+        } else {
+            randomSeed = Math.floor(new Date() as any / 8.64e7);
+        }
+        return randomSeed;
+    };
     const [dailiesSolved, setDailiesSolved] = createSignal<number>(
         loadNumFromStorage("GM_dailiesSolved", 0)
     );
@@ -125,7 +140,9 @@ export function Play(props: PageProps<{
                 flexDirection: 'column',
                 alignItems: "center",
                 paddingTop: 16,
+                gap: 2,
             }}>
+                Generating {puzzleDifficulty(seed())} puzzle... (may take a while for larger puzzles)
                 <CircularProgress variant="indeterminate" />
             </Box>}
         >
