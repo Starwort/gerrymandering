@@ -1,5 +1,4 @@
 import {CalendarToday, Casino, Construction, DarkMode, Favorite as Heart, InfoOutlined, LightMode, List as ListIcon, Menu as MenuIcon, Palette} from "@suid/icons-material";
-// ^ `ViewComfy as ViewCompact` is a workaround for https://github.com/swordev/suid/issues/291
 import {AppBar, Box, Button, CssBaseline, Dialog, DialogActions, DialogContent, DialogTitle, Drawer, IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText, ThemeProvider, Toolbar, Typography, createPalette, createTheme, useMediaQuery} from "@suid/material";
 import {JSXElement, Match, Show, Switch, createEffect, createMemo, createSignal, onCleanup} from "solid-js";
 import "./App.scss";
@@ -239,7 +238,7 @@ export default function App() {
                 <ListItem disablePadding>
                     <ListItemButton
                         component="a"
-                        href="https://github.com/Starwort/tangleword/"
+                        href="https://github.com/Starwort/gerrymandering/"
                     >
                         <ListItemIcon>
                             <GitHub />

@@ -35,7 +35,7 @@ export function InfoDialogue(props: InfoDialogueProps) {
                 <Button href="https://ko-fi.com/starwort" startIcon={<Kofi />} variant="contained">
                     Support me on Ko-fi
                 </Button>
-                <Button href="https://github.com/Starwort/tangleword/" startIcon={<GitHub />} variant="contained">
+                <Button href="https://github.com/Starwort/gerrymandering/" startIcon={<GitHub />} variant="contained">
                     View source on GitHub
                 </Button>
             </Box>
