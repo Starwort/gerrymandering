@@ -347,22 +347,24 @@ export function PlayPuzzle(props: PlayPuzzleProps) {
             >
                 Clear all
             </Button>
-            <Button
-                onClick={maybeConfirmCheat}
-                variant="contained"
-                color={!won() ? "error" : "primary"}
-                disabled={processingCheat()}
-                ref={(el) => {
-                    setTimeout(() => {
-                        el.style.minWidth = el.clientWidth + "px";
-                        el.style.minHeight = el.clientHeight + "px";
-                    }, 0);
-                }}
-            >
-                <Show when={processingCheat()} fallback="Reveal answer">
-                    <CircularProgress variant="indeterminate" size={24} />
-                </Show>
-            </Button>
+            <Show when={false}>
+                <Button
+                    onClick={maybeConfirmCheat}
+                    variant="contained"
+                    color={!won() ? "error" : "primary"}
+                    disabled={processingCheat()}
+                    ref={(el) => {
+                        setTimeout(() => {
+                            el.style.minWidth = el.clientWidth + "px";
+                            el.style.minHeight = el.clientHeight + "px";
+                        }, 0);
+                    }}
+                >
+                    <Show when={processingCheat()} fallback="Reveal answer">
+                        <CircularProgress variant="indeterminate" size={24} />
+                    </Show>
+                </Button>
+            </Show>
         </Toolbar>
     </>;
 }
