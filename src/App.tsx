@@ -1,4 +1,4 @@
-import {CalendarToday, Casino, Construction, DarkMode, Favorite as Heart, InfoOutlined, LightMode, List as ListIcon, Menu as MenuIcon, Palette} from "@suid/icons-material";
+import {CalendarToday, Casino, Construction, DarkMode, GridOff, GridOn, Favorite as Heart, InfoOutlined, LightMode, List as ListIcon, Menu as MenuIcon, Palette} from "@suid/icons-material";
 import {AppBar, Box, Button, CssBaseline, Dialog, DialogActions, DialogContent, DialogTitle, Drawer, IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText, ThemeProvider, Toolbar, Typography, createPalette, createTheme, useMediaQuery} from "@suid/material";
 import {JSXElement, Match, Show, Switch, createEffect, createMemo, createSignal, onCleanup} from "solid-js";
 import "./App.scss";
@@ -7,7 +7,7 @@ import {GitHub} from "./extra_icons";
 import {CustomPuzzles} from "./pages/CustomPuzzles";
 import {Play} from "./pages/Play";
 import {PuzzleDesigner} from "./pages/PuzzleDesigner";
-import {formatTime, loadNumFromStorage} from "./util";
+import {formatTime, loadBoolFromStorage, loadNumFromStorage} from "./util";
 
 export default function App() {
     const [query, setQuery] = createSignal(new URLSearchParams(window.location.search));
@@ -95,6 +95,12 @@ export default function App() {
         if (page == "random") {
             setPage("play", `seed=${Math.floor(Math.random() * 9e8 + 1e8)}`);
         }
+    });
+    const [easyMode, setEasyMode] = createSignal(
+        loadBoolFromStorage("GM_easyMode")
+    );
+    createEffect(() => {
+        window.localStorage.GM_easyMode = easyMode().toString();
     });
 
     return <ThemeProvider theme={theme}>
@@ -262,7 +268,25 @@ export default function App() {
                         </ListItemIcon>
                         <ListItemText
                             primary={themeColour() == "dark"
-                                ? "Light theme" : "Dark theme"}
+                                ? "Light Theme" : "Dark Theme"}
+                        />
+                    </ListItemButton>
+                </ListItem>
+                <ListItem disablePadding>
+                    <ListItemButton
+                        onClick={() => setEasyMode(
+                            easyMode => !easyMode
+                        )}
+                    >
+                        <ListItemIcon>
+                            <Show when={easyMode()} fallback={<GridOn />}>
+                                <GridOff />
+                            </Show>
+                        </ListItemIcon>
+                        <ListItemText
+                            primary={easyMode()
+                                ? "Normal Mode"
+                                : "Easy Mode"}
                         />
                     </ListItemButton>
                 </ListItem>
@@ -315,6 +339,7 @@ export default function App() {
                         setPage={setPage}
                         query={query}
                         puzzleColours={puzzleColours()}
+                        easyMode={easyMode()}
                     />
                 </Match>
                 <Match when={page() == "custom"}>

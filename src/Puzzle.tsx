@@ -1,6 +1,6 @@
 import {ArrowBack, ArrowForward} from "@suid/icons-material";
 import {Alert, Box, Button, Card, CircularProgress, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton, ToggleButton, Toolbar, useTheme} from "@suid/material";
-import {For, Index, Show, createEffect, createSignal, onCleanup, onMount} from "solid-js";
+import {For, Index, Show, createEffect, createResource, createSignal, onCleanup, onMount} from "solid-js";
 import {COLOURS, HIGHLIGHT_COLOURS} from "./colours";
 import {Board, Group, PuzzleData, serialise, validatePuzzleSolution, winnerFor} from "./puzzle";
 import CheatWorker from "./workers/cheatWorker?worker";
@@ -205,6 +205,7 @@ interface PlayPuzzleProps {
     puzzleColours: "rgb" | "cmy" | "rby";
     onComplete: () => void;
     onCheat: () => void;
+    easyMode: boolean;
 }
 export function PlayPuzzle(props: PlayPuzzleProps) {
     let saveSlot = () => "GM_" + (props.data.isDaily ? props.data.randomSeed.toString() : serialise(props.data.board));
@@ -261,6 +262,12 @@ export function PlayPuzzle(props: PlayPuzzleProps) {
         }
     };
 
+    const [easyModeGroups] = createResource<Group[]>(
+        () => props.easyMode,
+        easy => (easy && props.data.generatedFromSeed) ? CHEAT(props.data.randomSeed) : [],
+        {initialValue: []},
+    );
+
     const [highlightMode, setHighlightMode] = createSignal<'erase' | 'draw'>('draw');
 
     const [cheatOpen, setCheatOpen] = createSignal(false);
@@ -306,7 +313,10 @@ export function PlayPuzzle(props: PlayPuzzleProps) {
                 <Alert severity="success" variant="filled">You have completed this puzzle!</Alert>
             </Show>
         </Box>
-        Make {{cmy: "Cyan", rgb: "Red", rby: "Red"}[props.puzzleColours]} win!
+        Make {{cmy: "Cyan", rgb: "Red", rby: "Red"}[props.puzzleColours]} win
+        <Show when={easyModeGroups().length && props.easyMode}
+        > in {easyModeGroups().length} groups of {easyModeGroups()[0].length}
+        </Show>!
         <Box sx={{
             display: "flex",
             flexDirection: "row",

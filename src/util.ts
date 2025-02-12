@@ -5,6 +5,16 @@ export function loadNumFromStorage(key: string, defaultValue: number): number {
     }
     return value;
 }
+export function loadBoolFromStorage(key: string, defaultValue: boolean = false): boolean {
+    let value = window.localStorage[key];
+    if (value === "true") {
+        return true;
+    } else if (value === "false") {
+        return false;
+    } else {
+        return defaultValue;
+    }
+}
 
 export function formatTime(millis: number) {
     let seconds = Math.floor(millis / 1000);

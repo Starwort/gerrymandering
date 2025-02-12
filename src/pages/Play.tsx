@@ -3,7 +3,7 @@ import {Box, Button, CircularProgress, Dialog, DialogActions, DialogContent, Dia
 import {Accessor, JSXElement, Show, createEffect, createResource, createSignal} from "solid-js";
 import {PlayPuzzle} from "../Puzzle";
 import {PuzzleData, puzzleDifficulty, serialise} from "../puzzle";
-import {loadNumFromStorage} from "../util";
+import {loadBoolFromStorage, loadNumFromStorage} from "../util";
 import PuzzleGenWorker from "../workers/puzzleGenWorker?worker";
 import {PageProps} from "./PageProps";
 
@@ -16,6 +16,7 @@ export function Play(props: PageProps<{
     setLastDailySolved: (value: number) => void;
     lastDailySolved: number;
     query: Accessor<URLSearchParams>;
+    easyMode: boolean;
 }) {
     const [statisticModalOpen, setStatisticModalOpen] = createSignal(false);
 
@@ -53,13 +54,13 @@ export function Play(props: PageProps<{
         }
         return randomSeed;
     };
-    const [dailiesSolved, setDailiesSolved] = createSignal<number>(
+    const [dailiesSolved, setDailiesSolved] = createSignal(
         loadNumFromStorage("GM_dailiesSolved", 0)
     );
     createEffect(() => {
         window.localStorage.GM_dailiesSolved = dailiesSolved().toString();
     });
-    const [dailyStreak, setDailyStreak] = createSignal<number>(
+    const [dailyStreak, setDailyStreak] = createSignal(
         loadNumFromStorage("GM_dailyStreak", 0)
     );
     createEffect(() => {
@@ -68,7 +69,7 @@ export function Play(props: PageProps<{
         }
         window.localStorage.GM_dailyStreak = dailyStreak().toString();
     });
-    const [bestDailyStreak, setBestDailyStreak] = createSignal<number>(
+    const [bestDailyStreak, setBestDailyStreak] = createSignal(
         loadNumFromStorage("GM_bestDailyStreak", 0)
     );
     createEffect(() => {
@@ -167,6 +168,7 @@ export function Play(props: PageProps<{
                     setDailyStreak(0);
                     setStatisticModalOpen(true);
                 } : () => {}}
+                easyMode={props.easyMode}
             />
         </Show>
     </>;

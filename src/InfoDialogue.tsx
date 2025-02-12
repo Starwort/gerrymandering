@@ -39,6 +39,11 @@ export function InfoDialogue(props: InfoDialogueProps) {
                 their button or using the numbers 0-9.
             </Typography>
             <Typography sx={{mb: 1}}>
+                For random puzzles, in Easy Mode, the expected number of districts
+                and their sizes are shown. Solutions with other sizes of district
+                are still valid.
+            </Typography>
+            <Typography sx={{mb: 1}}>
                 Original puzzle by <Link
                     target="_blank"
                     href="https://www.youtube.com/@v.deckard"
