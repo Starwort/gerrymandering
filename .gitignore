@@ -1,5 +1,7 @@
 
 dist
+wasm/pkg
+wasm/target
 .solid
 .output
 .vercel

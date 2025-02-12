@@ -1,4 +1,6 @@
-import {Board, CHEAT, Group, solveBoard} from "../puzzle";
+import init, {solve_puzzle} from 'wasm';
+import {Board, CHEAT, Group, serialise} from "../puzzle";
+await init();
 onmessage = (event: MessageEvent<[number | Board, number]>) => {
     const [board, nonce] = event.data;
     try {
@@ -6,7 +8,7 @@ onmessage = (event: MessageEvent<[number | Board, number]>) => {
         if (typeof board == "number") {
             solution = CHEAT(board);
         } else {
-            solution = solveBoard(board);
+            solution = solve_puzzle(serialise(board));
         }
         postMessage({solution, nonce});
     } catch (error) {

@@ -7,6 +7,7 @@
     "start": "vite",
     "dev": "vite",
     "build": "vite build",
+    "build:wasm": "cd wasm && wasm-pack build --target web --out-dir pkg",
     "serve": "vite preview"
   },
   "license": "MIT",
@@ -22,6 +23,7 @@
     "@suid/icons-material": "^0.8.1",
     "@suid/material": "^0.18.0",
     "@suid/vite-plugin": "^0.3.1",
-    "solid-js": "^1.9.4"
+    "solid-js": "^1.9.4",
+    "wasm": "file:wasm/pkg"
   }
 }

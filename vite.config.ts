@@ -17,5 +17,8 @@ export default defineConfig({
     build: {
         target: 'esnext',
     },
+    optimizeDeps: {
+        exclude: ["wasm"]
+    },
     base: "/gerrymandering/"
 });

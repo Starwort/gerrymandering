@@ -245,6 +245,9 @@ export function puzzleFromString(input: string): PuzzleData {
         }
         board.push(row);
     }
+    if (board.length != h || board.some(row => row.length != w)) {
+        throw new Error("Invalid board data");
+    }
 
     return {
         board,
