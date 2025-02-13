@@ -3,6 +3,7 @@ import {Alert, Box, Button, Card, CircularProgress, Dialog, DialogActions, Dialo
 import {For, Index, Show, createEffect, createResource, createSignal, onCleanup, onMount} from "solid-js";
 import {COLOURS, HIGHLIGHT_COLOURS} from "./colours";
 import {Board, Group, PuzzleData, serialise, validatePuzzleSolution, winnerFor} from "./puzzle";
+import {Use} from "./svgUtil";
 import CheatWorker from "./workers/cheatWorker?worker";
 
 const PATTERNS = ["semi-transparent", "ur", "dr", "x"];
@@ -72,7 +73,7 @@ export function PuzzleView(props: PuzzleViewProps) {
             <Index each={props.groups}>{(group, i) => <>
                 <path id={`path-${i}`} d={generatePathForGroup(group())} />
                 <clipPath id={`clip-${i}`}>
-                    <use href={`#path-${i}`} />
+                    <Use href={`#path-${i}`} />
                 </clipPath>
             </>}</Index>
         </defs>
@@ -99,7 +100,7 @@ export function PuzzleView(props: PuzzleViewProps) {
             )}</Index>
         )}</Index>
         <Index each={props.groups}>{(_, i) => (
-            <use
+            <Use
                 href={`#path-${i}`}
                 fill={`url(#shade-${HIGHLIGHT_COLOURS[i % HIGHLIGHT_COLOURS.length]}-${PATTERNS[Math.floor(i / HIGHLIGHT_COLOURS.length) % PATTERNS.length]})`}
                 stroke={HIGHLIGHT_COLOURS[i % HIGHLIGHT_COLOURS.length]}
