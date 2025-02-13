@@ -136,11 +136,12 @@ fn solve_board(board: &Board) -> Result<Vec<Group>> {
     Err(Error::new("Board is unsolvable"))
 }
 
-pub(crate) fn try_solve_board_with_groups(
+fn try_solve_board_with_groups(
     board: &Board,
     groups: usize,
     cells_per_group: usize,
 ) -> Option<Vec<Group>> {
+    /// Recursively try to solve the board with the given configuration.
     fn solve_with_partial_groups(
         board: &Board,
         groups: usize,
@@ -150,25 +151,34 @@ pub(crate) fn try_solve_board_with_groups(
         formed_groups: &Vec<Group>,
         active_group: Group,
     ) -> Option<Vec<Group>> {
+        // Cache check - if present, we've already done this
         let val = (formed_groups.clone(), active_group.clone());
         if cache.read().unwrap().contains(&val) {
             return None;
         }
         cache.write().unwrap().insert(val);
+
         if active_group.len() == cells_per_group {
+            // If the active group is finished, make sure there's a winner
             winner_for(board, &active_group, n_colours)?;
+            // then add it to the list of formed groups
             let next_groups = {
                 let mut groups = formed_groups.clone();
                 groups.push(active_group);
                 groups
             };
             if next_groups.len() == groups {
+                // If we've successfully partitioned the board, we can return
+                // either Some(solution) or None if the solution wasn't valid
                 if validate_candidate_solution(board, &next_groups) {
                     return Some(next_groups);
                 } else {
                     return None;
                 }
             } else {
+                // Otherwise, check if it's still possible for colour 0 to win
+                // - colour 0 must have at least as many votes as the runner-up
+                // + the number of remaining groups
                 let remaining_votes = groups - next_groups.len();
                 let mut votes = vec![0; n_colours];
                 for group in &*next_groups {
@@ -176,6 +186,8 @@ pub(crate) fn try_solve_board_with_groups(
                 }
                 let minority = votes.remove(0);
                 if votes.into_iter().any(|v| v > minority + remaining_votes) {
+                    // If any group has already beaten colour 0, we can prune
+                    // this branch
                     return None;
                 }
             }
@@ -189,6 +201,8 @@ pub(crate) fn try_solve_board_with_groups(
                 vec![],
             )
         } else if active_group.is_empty() {
+            // If this is a new group, find the first free cell (WLoG) and
+            // start a new group from there
             for y in 0..board.shape()[0] {
                 for x in 0..board.shape()[1] {
                     if !formed_groups.iter().any(|group| group.contains(&(x, y))) {
@@ -208,19 +222,31 @@ pub(crate) fn try_solve_board_with_groups(
             }
             unreachable!()
         } else {
+            // Otherwise, we've got a partially-filled group - determine all
+            // possible next cells and recurse on them
             active_group
                 .iter()
                 .flat_map(|&(x, y)| {
+                    // for each cell
                     [(usize::MAX, 0), (1, 0), (0, usize::MAX), (0, 1)]
                         .into_iter()
                         .map(move |(dx, dy)| (x.wrapping_add(dx), y.wrapping_add(dy)))
-                        .filter(|&(dx, dy)| {
-                            dx < board.shape()[1] && dy < board.shape()[0]
-                        })
+                        .filter(|&(nx, ny)| {
+                            // the neighbour must be in-bounds and not already
+                            // in any group
+                            nx < board.shape()[1]
+                                && ny < board.shape()[0]
+                                && !active_group.contains(&(nx, ny))
+                                && !formed_groups
+                                    .iter()
+                                    .any(|group| group.contains(&(nx, ny)))
+                        }) // each of its valid neighbours
                 })
                 .collect::<Vec<_>>()
                 .into_par_iter()
                 .find_map_any(|(x, y)| {
+                    // Recursively call the solver on each of the neighbours
+                    // (in parallel thanks to Rayon)
                     let mut new_group = active_group.clone();
                     new_group.push((x, y));
                     new_group.sort();
