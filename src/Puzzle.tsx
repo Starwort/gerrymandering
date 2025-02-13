@@ -290,7 +290,12 @@ export function PlayPuzzle(props: PlayPuzzleProps) {
 
     const [activeGroup, setActiveGroup] = createSignal<number>(0);
     createEffect(() => {
-        if (activeGroup() >= groups().length) {
+        if (activeGroup() >= 80) {
+            setActiveGroup(0);
+        }
+    });
+    createEffect(() => {
+        if (groups().length < 80) {
             setGroups(groups => [
                 ...groups,
                 ...Array(80 - groups.length).fill(0).map(() => []),
@@ -377,7 +382,7 @@ export function PlayPuzzle(props: PlayPuzzleProps) {
             <GroupSelector
                 activeGroup={activeGroup()}
                 setGroup={setActiveGroup}
-                cellsInGroups={groups().map(group => group.length)}
+                groups={groups()}
             />
         </Box>
         <Toolbar sx={{gap: 2}}>
@@ -411,7 +416,7 @@ export function PlayPuzzle(props: PlayPuzzleProps) {
 
 interface GroupSelectorProps {
     activeGroup: number;
-    cellsInGroups: number[];
+    groups: Group[];
     setGroup: (group: number) => void;
 }
 function GroupSelector(props: GroupSelectorProps) {
@@ -466,13 +471,45 @@ function GroupSelector(props: GroupSelectorProps) {
                         value={i! + page() * 10}
                         selected={i! + page() * 10 == props.activeGroup}
                         onChange={() => props.setGroup(page() * 10 + i!)}
+                        sx={{
+                            borderColor:
+                                shouldColourWarn(props.groups[i! + page() * 10], props.groups)
+                                    ? "error.main"
+                                    : undefined
+                        }}
                     >
-                        <HighlightPreview id={i! + page() * 10} cellsInGroup={props.cellsInGroups[i! + page() * 10]} />
+                        <HighlightPreview id={i! + page() * 10} cellsInGroup={props.groups[i! + page() * 10]?.length ?? 0} />
                     </ToggleButton>
                 </Show>
             )}</For>
         </Box>
     </Card>;
+}
+
+function shouldColourWarn(thisGroup: Group, groups: Group[]): boolean {
+    if (!thisGroup || thisGroup.length == 0) {
+        return false;
+    }
+    if (thisGroup.some(([x, y]) => !thisGroup.some(([a, b]) => Math.abs(x - a) + Math.abs(y - b) == 1)) && thisGroup.length != 1) {
+        return true;
+    }
+    let mostCommonCellsInGroup: Record<number, number> = {};
+    for (let i of groups) {
+        if (i.length == 0) {
+            continue;
+        }
+        mostCommonCellsInGroup[i.length] ??= 0;
+        mostCommonCellsInGroup[i.length]++;
+    }
+    let mostCommon = Object.entries(mostCommonCellsInGroup).reduce(
+        ([as, ac], [b, bc]): [number[], number] => ac > bc
+            ? [as, ac]
+            : bc > ac
+                ? [[+b], bc]
+                : [[...as, +b], ac],
+        [[], 0] as [number[], number]
+    )[0];
+    return !mostCommon.includes(thisGroup.length);
 }
 
 function HighlightPreview(props: {id: number; cellsInGroup: number;}) {
