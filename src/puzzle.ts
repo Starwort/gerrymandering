@@ -107,7 +107,14 @@ function minToWin(objects: number, nColours: number): number {
 
 function fillGroups(groups: Group[], board: Board, nColours: number, random: Random, baseNo = 0): void {
     shuffle(groups, random);
-    let minMinorityGroups = minToWin(groups.length, nColours);
+    // We check baseNo here to ensure that for cyan, we always guarantee enough
+    // groups for a majority (e.g. in a 2-colour, 8-group board, cyan needs 5
+    // groups) - but for the other colours, we *don't* apply this overcorrection
+    // (e.g. in a 7-group game, after allocating cyan 3 groups we mustn't
+    // accidentally allocate magenta 3 groups)
+    let minMinorityGroups = baseNo == 0
+        ? minToWin(groups.length, nColours)
+        : Math.ceil(groups.length / nColours);
     let minorityGroups = groups.splice(0, minMinorityGroups);
     for (let group of minorityGroups) {
         let minCellsToWinGroup = minToWin(group.length, nColours);
