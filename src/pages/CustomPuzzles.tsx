@@ -35,6 +35,7 @@ const CUSTOM_PUZZLES: Record<string, [string, string][]> = {
     ],
     "Community Puzzles": [
         ["Ondra's 2-Colour 7×7", "2;7x7;0111101;1110101;1111110;0101010;1001100;0111111;1110110"],
+        ["hhhguir's 6-Colour 7×7", "6;7x7;0125340;5125345;1255534;5555555;1255534;5125345;0125340"],
     ],
 };
 
