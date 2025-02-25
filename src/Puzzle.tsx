@@ -199,6 +199,27 @@ function CheatDialogue(props: CheatDialogueProps) {
     </Dialog>;
 }
 
+export function loadGroupsFromStorage(board: Board, saveSlot: string): Group[] {
+    let savedGroups = JSON.parse(window.localStorage[saveSlot] || "[]");
+    if (
+        !Array.isArray(savedGroups)
+        || savedGroups.some((group: any) => !Array.isArray(group))
+        || savedGroups.some((group: any) => group.some((cell: any) => (
+            !Array.isArray(cell)
+            || cell.length != 2
+            || typeof cell[0] != "number" || cell[0] != cell[0]
+            || typeof cell[1] != "number" || cell[1] != cell[1]
+            || cell[0] < 0 || cell[0] >= board[0].length
+            || cell[1] < 0 || cell[1] >= board.length
+        )))
+    ) {
+        if (window.localStorage[saveSlot]) {
+            throw new Error("Save data for this puzzle is corrupted, resetting");
+        }
+    }
+    return savedGroups;
+}
+
 interface PlayPuzzleProps {
     data: PuzzleData;
     setError: (error: string) => void;
@@ -210,27 +231,13 @@ interface PlayPuzzleProps {
 }
 export function PlayPuzzle(props: PlayPuzzleProps) {
     let saveSlot = () => "GM_" + (props.data.isDaily ? props.data.randomSeed.toString() : serialise(props.data.board));
-    let savedGroups: Group[] = JSON.parse(window.localStorage[saveSlot()] || "null");
-    if (
-        !Array.isArray(savedGroups)
-        || savedGroups.some((group: any) => !Array.isArray(group))
-        || savedGroups.some((group: any) => group.some((cell: any) => (
-            !Array.isArray(cell)
-            || cell.length != 2
-            || typeof cell[0] != "number" || cell[0] != cell[0]
-            || typeof cell[1] != "number" || cell[1] != cell[1]
-            || cell[0] < 0 || cell[0] >= props.data.board[0].length
-            || cell[1] < 0 || cell[1] >= props.data.board.length
-        )))
-    ) {
-        savedGroups = [];
-        if (window.localStorage[saveSlot()]) {
-            props.setError("Save data for this puzzle is corrupted, resetting");
-        }
+    let savedGroups: Group[] = [];
+    try {
+        savedGroups = loadGroupsFromStorage(props.data.board, saveSlot());
+    } catch (e) {
+        props.setError((e as Error).message);
     }
-    const [groups, setGroups] = createSignal<Group[]>(
-        savedGroups,
-    );
+    const [groups, setGroups] = createSignal<Group[]>(savedGroups);
     createEffect(() => {
         window.localStorage[saveSlot()] = JSON.stringify(groups());
     });

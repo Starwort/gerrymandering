@@ -1,8 +1,7 @@
-import {debounce} from "@solid-primitives/scheduled";
 import {Launch, Share} from "@suid/icons-material";
 import {Alert, Box, Button, Card, CircularProgress, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton, TextField, ToggleButton, useTheme} from "@suid/material";
 import {For, JSXElement, Match, Show, Switch, createResource, createSignal, onCleanup, onMount} from "solid-js";
-import {CHEAT, PuzzleView} from "../Puzzle";
+import {PuzzleView, loadGroupsFromStorage} from "../Puzzle";
 import {COLOURS} from "../colours";
 import {Board, Group, serialise, validatePuzzleSolution} from "../puzzle";
 import {PageProps} from "./PageProps";
@@ -35,19 +34,36 @@ export function PuzzleDesigner(props: PageProps<{
         return true;
     };
 
-    const debouncedCheat = debounce((board: Board, cb: (v: Group[]) => void) => {
-        if (!isValidByColourQty()) {
-            return cb([]);
-        }
-        if (validatePuzzleSolution(validationResult.latest, board)) {
-            // don't bother recalculating if the previous solution is still valid
-            return cb(validationResult.latest);
-        }
-        CHEAT(board).then(cb);
-    }, 500);
     const [x, setX] = createSignal(7);
     const [y, setY] = createSignal(7);
-    const [validationResult] = createResource<Group[]>(board, (board: Board) => new Promise(resolve => debouncedCheat(board, resolve)), {initialValue: []});
+    // const debouncedCheat = debounce((board: Board, cb: (v: Group[]) => void) => {
+    //     if (!isValidByColourQty()) {
+    //         return cb([]);
+    //     }
+    //     if (validatePuzzleSolution(validationResult.latest, board)) {
+    //         // don't bother recalculating if the previous solution is still valid
+    //         return cb(validationResult.latest);
+    //     }
+    //     CHEAT(board).then(cb);
+    // }, 500);
+    // const [validationResult] = createResource<Group[]>(board, (board: Board) => new Promise(resolve => debouncedCheat(board, resolve)), {initialValue: []});
+    const [validationResult, {refetch}] = createResource<Group[]>(board, async (board: Board) => {
+        let slot = "GM_" + serialise(board);
+        let savedGroups: Group[] = [];
+        try {
+            savedGroups = loadGroupsFromStorage(board, slot);
+            console.log(savedGroups);
+        } catch (e) {
+            console.error(e);
+        }
+        if (validatePuzzleSolution(savedGroups.filter(g => g.length != 0), board)) {
+            console.log("Solution is valid");
+            return savedGroups;
+        } else {
+            console.log("Solution is invalid");
+            return [];
+        }
+    }, {initialValue: []});
     const url = () => {
         const urlObj = new URL(location.origin + location.pathname);
         urlObj.searchParams.set("puzzle", serialise(board()));
@@ -103,14 +119,14 @@ export function PuzzleDesigner(props: PageProps<{
                     <Match when={!isValidByColourQty()}>
                         Cell colours are invalid
                     </Match>
-                    <Match when={validationResult.loading}>
+                    {/* <Match when={validationResult.loading}>
                         Validating puzzle...
-                    </Match>
+                    </Match> */}
                     <Match when={validationResult().length}>
                         Puzzle looks good!
                     </Match>
                     <Match when={true}>
-                        Puzzle is unsolvable.
+                        Puzzle has not yet been validated.
                     </Match>
                 </Switch>
             </Alert>
@@ -124,6 +140,13 @@ export function PuzzleDesigner(props: PageProps<{
                     setBoard(board => board.map(row => row.map(cell => ordered.indexOf(cell))));
                 }}>
                     Fix it
+                </Button>
+            </Show>
+            <Show when={isValidByColourQty() && !validationResult.loading && !validationResult().length}>
+                <Button variant="contained" onClick={() => {
+                    refetch();
+                }}>
+                    Check for puzzle solution
                 </Button>
             </Show>
         </Box>
