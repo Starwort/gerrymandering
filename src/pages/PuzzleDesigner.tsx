@@ -133,6 +133,7 @@ export function PuzzleDesigner(props: PageProps<{
                     const ordered = [...cellQtys].sort((a, b) => a == 0 ? Infinity : b == 0 ? -Infinity : a - b);
                     for (let i = 0; i < 6; i++) {
                         ordered[i] = cellQtys.indexOf(ordered[i]);
+                        cellQtys[ordered[i]] = -1;
                     }
                     setBoard(board => board.map(row => row.map(cell => ordered.indexOf(cell))));
                 }}>
