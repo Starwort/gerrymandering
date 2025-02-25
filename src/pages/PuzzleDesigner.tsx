@@ -52,15 +52,12 @@ export function PuzzleDesigner(props: PageProps<{
         let savedGroups: Group[] = [];
         try {
             savedGroups = loadGroupsFromStorage(board, slot);
-            console.log(savedGroups);
         } catch (e) {
             console.error(e);
         }
         if (validatePuzzleSolution(savedGroups.filter(g => g.length != 0), board)) {
-            console.log("Solution is valid");
             return savedGroups;
         } else {
-            console.log("Solution is invalid");
             return [];
         }
     }, {initialValue: []});
