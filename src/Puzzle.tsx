@@ -1,4 +1,4 @@
-import {ArrowBack, ArrowForward} from "@suid/icons-material";
+import {ArrowBack, ArrowForward, HelpOutline} from "@suid/icons-material";
 import {Alert, Box, Button, Card, CircularProgress, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton, ToggleButton, Toolbar, useTheme} from "@suid/material";
 import {For, Index, Show, createEffect, createResource, createSignal, onCleanup, onMount} from "solid-js";
 import {COLOURS, HIGHLIGHT_COLOURS} from "./colours";
@@ -429,6 +429,9 @@ interface GroupSelectorProps {
 }
 function GroupSelector(props: GroupSelectorProps) {
     const [page, setPage] = createSignal(Math.floor(props.activeGroup / 10));
+    const [help, showHelp] = createSignal(false);
+
+    const [helpSelectedButton, setHelpSelectedButton] = createSignal(0);
 
     const keyListener = (event: KeyboardEvent) => {
         if (['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'].includes(event.key.toUpperCase())) {
@@ -443,55 +446,167 @@ function GroupSelector(props: GroupSelectorProps) {
     onCleanup(() => {
         document.removeEventListener("keydown", keyListener);
     });
-    return <Card sx={{minWidth: 192}} raised>
-        <Box sx={{
-            display: "grid",
-            padding: 2,
-            gap: 1,
-            gridTemplateColumns: "repeat(3, 1fr)",
+    return <>
+        <Dialog open={help()} onClose={() => {
+            showHelp(false);
+            setHelpSelectedButton(0);
         }}>
-            <IconButton
-                disabled={page() == 0}
-                onClick={() => setPage(page => --page)}
-            >
-                <Show when={page() > 0}>
-                    <ArrowBack />
-                </Show>
-            </IconButton>
-            <Box sx={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-            }}>
-                {'ABCDEFGH'[page()]}
-            </Box>
-            <IconButton
-                disabled={page() == 7}
-                onClick={() => setPage(page => ++page)}
-            >
-                <Show when={page() < 7}>
-                    <ArrowForward />
-                </Show>
-            </IconButton>
-            <For each={[0, 1, 2, 3, 4, 5, 6, 7, 8, null, 9]}>{(i) => (
-                <Show when={i !== null} fallback={<IconButton disabled />}>
+            <DialogTitle>
+                How to use the Colour Picker
+            </DialogTitle>
+            <DialogContent>
+                <DialogContentText gutterBottom>
+                    Select a colour with the buttons or the numbers on your
+                    keyboard (indicated in the top right of each button).
+                </DialogContentText>
+                <Box sx={{
+                    display: "flex",
+                    gap: 1,
+                    margin: "8px calc(50% - 80px)",
+                    marginTop: 0,
+                }}>
                     <ToggleButton
-                        value={i! + page() * 10}
-                        selected={i! + page() * 10 == props.activeGroup}
-                        onChange={() => props.setGroup(page() * 10 + i!)}
-                        sx={{
-                            borderColor:
-                                shouldColourWarn(props.groups[i! + page() * 10], props.groups)
-                                    ? "error.main"
-                                    : undefined
-                        }}
+                        value={0}
+                        onChange={() => setHelpSelectedButton(0)}
+                        selected={helpSelectedButton() == 0}
                     >
-                        <HighlightPreview id={i! + page() * 10} cellsInGroup={props.groups[i! + page() * 10]?.length ?? 0} />
+                        <HighlightPreview id={0} cellsInGroup={5} />
                     </ToggleButton>
-                </Show>
-            )}</For>
-        </Box>
-    </Card>;
+                    <ToggleButton
+                        value={1}
+                        onChange={() => setHelpSelectedButton(1)}
+                        selected={helpSelectedButton() == 1}
+                    >
+                        <HighlightPreview id={1} cellsInGroup={5} />
+                    </ToggleButton>
+                    <ToggleButton
+                        value={2}
+                        onChange={() => setHelpSelectedButton(2)}
+                        selected={helpSelectedButton() == 2}
+                    >
+                        <HighlightPreview id={2} cellsInGroup={5} />
+                    </ToggleButton>
+                </Box>
+                <DialogContentText gutterBottom>
+                    The active colour will be used to highlight cells in the
+                    puzzle as you click and drag.
+                </DialogContentText>
+                <DialogContentText gutterBottom>
+                    It doesn't matter which colours you use to mark up regions,
+                    so long as the regions you've drawn form a valid solution.
+                </DialogContentText>
+                <DialogContentText gutterBottom>
+                    If a region contains an obvious error (it contains
+                    non-contiguous cells, or multiple other regions contain a
+                    different number of cells to this region), it will be
+                    highlighted:
+                </DialogContentText>
+                <Box sx={{
+                    display: "flex",
+                    gap: 1,
+                    margin: "8px calc(50% - 80px)",
+                    marginTop: 0,
+                }}>
+                    <ToggleButton
+                        value={0}
+                        onChange={() => setHelpSelectedButton(0)}
+                        selected={helpSelectedButton() == 0}
+                        sx={{borderColor: "error.main"}}
+                    >
+                        <HighlightPreview id={0} cellsInGroup={4} />
+                    </ToggleButton>
+                    <ToggleButton
+                        value={1}
+                        onChange={() => setHelpSelectedButton(1)}
+                        selected={helpSelectedButton() == 1}
+                    >
+                        <HighlightPreview id={1} cellsInGroup={5} />
+                    </ToggleButton>
+                    <ToggleButton
+                        value={2}
+                        onChange={() => setHelpSelectedButton(2)}
+                        selected={helpSelectedButton() == 2}
+                    >
+                        <HighlightPreview id={2} cellsInGroup={5} />
+                    </ToggleButton>
+                </Box>
+                <DialogContentText>
+                    Switch pages using the arrow buttons or the keys A-H on your
+                    keyboard. There are 20 total colours and four different patterns to
+                    choose from to highlight your regions, so pick your
+                    favourites.
+                </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+                <Button onClick={() => showHelp(false)}>
+                    Okay
+                </Button>
+            </DialogActions>
+        </Dialog>
+        <Card sx={{minWidth: 192}} raised>
+            <Box sx={{
+                display: "grid",
+                padding: 2,
+                gap: 1,
+                gridTemplateColumns: "repeat(3, 1fr)",
+            }}>
+                <Box sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    gridColumn: "span 3",
+                }}>
+                    Colour Picker
+                    <IconButton
+                        onClick={() => showHelp(true)}
+                        sx={{margin: -1}}
+                    >
+                        <HelpOutline />
+                    </IconButton>
+                </Box>
+                <IconButton
+                    disabled={page() == 0}
+                    onClick={() => setPage(page => --page)}
+                >
+                    <Show when={page() > 0}>
+                        <ArrowBack />
+                    </Show>
+                </IconButton>
+                <Box sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                }}>
+                    {'ABCDEFGH'[page()]}
+                </Box>
+                <IconButton
+                    disabled={page() == 7}
+                    onClick={() => setPage(page => ++page)}
+                >
+                    <Show when={page() < 7}>
+                        <ArrowForward />
+                    </Show>
+                </IconButton>
+                <For each={[0, 1, 2, 3, 4, 5, 6, 7, 8, null, 9]}>{(i) => (
+                    <Show when={i !== null} fallback={<IconButton disabled />}>
+                        <ToggleButton
+                            value={i! + page() * 10}
+                            selected={i! + page() * 10 == props.activeGroup}
+                            onChange={() => props.setGroup(page() * 10 + i!)}
+                            sx={{
+                                borderColor:
+                                    shouldColourWarn(props.groups[i! + page() * 10], props.groups)
+                                        ? "error.main"
+                                        : undefined
+                            }}
+                        >
+                            <HighlightPreview id={i! + page() * 10} cellsInGroup={props.groups[i! + page() * 10]?.length ?? 0} />
+                        </ToggleButton>
+                    </Show>
+                )}</For>
+            </Box>
+        </Card>
+    </>;
 }
 
 function shouldColourWarn(thisGroup: Group, groups: Group[]): boolean {
