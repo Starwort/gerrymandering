@@ -391,6 +391,7 @@ export function PlayPuzzle(props: PlayPuzzleProps) {
                 activeGroup={activeGroup()}
                 setGroup={setActiveGroup}
                 groups={groups()}
+                board={props.data.board}
             />
         </Box>
         <Toolbar sx={{gap: 2}}>
@@ -426,6 +427,7 @@ interface GroupSelectorProps {
     activeGroup: number;
     groups: Group[];
     setGroup: (group: number) => void;
+    board: Board;
 }
 function GroupSelector(props: GroupSelectorProps) {
     const [page, setPage] = createSignal(Math.floor(props.activeGroup / 10));
@@ -497,9 +499,9 @@ function GroupSelector(props: GroupSelectorProps) {
                 </DialogContentText>
                 <DialogContentText gutterBottom>
                     If a region contains an obvious error (it contains
-                    non-contiguous cells, or multiple other regions contain a
-                    different number of cells to this region), it will be
-                    highlighted:
+                    non-contiguous cells, multiple other regions contain a
+                    different number of cells to this region, or its winner
+                    would be a tie), it will be highlighted:
                 </DialogContentText>
                 <Box sx={{
                     display: "flex",
@@ -526,6 +528,7 @@ function GroupSelector(props: GroupSelectorProps) {
                         value={2}
                         onChange={() => setHelpSelectedButton(2)}
                         selected={helpSelectedButton() == 2}
+                        sx={{borderColor: "error.main"}}
                     >
                         <HighlightPreview id={2} cellsInGroup={5} />
                     </ToggleButton>
@@ -595,7 +598,7 @@ function GroupSelector(props: GroupSelectorProps) {
                             onChange={() => props.setGroup(page() * 10 + i!)}
                             sx={{
                                 borderColor:
-                                    shouldColourWarn(props.groups[i! + page() * 10], props.groups)
+                                    shouldColourWarn(props.groups[i! + page() * 10], props.groups, props.board)
                                         ? "error.main"
                                         : undefined
                             }}
@@ -609,7 +612,7 @@ function GroupSelector(props: GroupSelectorProps) {
     </>;
 }
 
-function shouldColourWarn(thisGroup: Group, groups: Group[]): boolean {
+function shouldColourWarn(thisGroup: Group, groups: Group[], board: Board): boolean {
     if (!thisGroup || thisGroup.length == 0) {
         return false;
     }
@@ -623,6 +626,9 @@ function shouldColourWarn(thisGroup: Group, groups: Group[]): boolean {
         }
         mostCommonCellsInGroup[i.length] ??= 0;
         mostCommonCellsInGroup[i.length]++;
+        if (winnerFor(board, i) == null) {
+            return true;
+        }
     }
     let mostCommon = Object.entries(mostCommonCellsInGroup).reduce(
         ([as, ac], [b, bc]): [number[], number] => ac > bc
