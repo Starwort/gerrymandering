@@ -260,16 +260,32 @@ export function puzzleFromString(input: string): PuzzleData {
     };
 }
 
+export function isConnected(group: Group) {
+    if (group.length < 2) {
+        return true;
+    }
+    let todo = [group[0]];
+    let found = group.map(() => false);
+    found[0] = true;
+    while (todo.length) {
+        let [x, y] = todo.pop()!;
+        for (let [nx, ny] of [[x - 1, y], [x + 1, y], [x, y - 1], [x, y + 1]]) {
+            group.forEach(([cx, cy], i) => {
+                if (cx == nx && cy == ny && !found[i]) {
+                    found[i] = true;
+                    todo.push([cx, cy]);
+                }
+            });
+        }
+    }
+    return found.every(v => v);
+}
+
 export function validatePuzzleSolution(groups: Group[], board: Board): boolean {
     if (
         !groups.length
         || groups.some(group => group.length != groups[0].length)
-        || groups.some(group => !group.every(([x, y]) => (
-            group.some(([x2, y2]) => x2 == x - 1 && y2 == y)
-            || group.some(([x2, y2]) => x2 == x + 1 && y2 == y)
-            || group.some(([x2, y2]) => x2 == x && y2 == y - 1)
-            || group.some(([x2, y2]) => x2 == x && y2 == y + 1)
-        )))
+        || groups.some(group => !isConnected(group))
         || groups.reduce((acc, group) => acc + group.length, 0) != board.length * board[0].length
     ) {
         return false;
@@ -339,7 +355,8 @@ export function solveBoard(board: Board): Group[] {
     throw new Error("Board is unsolvable");
 }
 
-export type Group = [number, number][];
+export type Coordinate = [number, number];
+export type Group = Coordinate[];
 export type Board = number[][];
 
 function trySolveBoardWithKnownGroups(board: Board, groups: number, cellsPerGroup: number): Group[] {

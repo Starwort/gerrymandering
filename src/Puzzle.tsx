@@ -1,8 +1,8 @@
 import {ArrowBack, ArrowForward, HelpOutline} from "@suid/icons-material";
 import {Alert, Box, Button, Card, CircularProgress, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton, ToggleButton, Toolbar, useTheme} from "@suid/material";
-import {For, Index, Show, createEffect, createResource, createSignal, onCleanup, onMount} from "solid-js";
+import {createEffect, createResource, createSignal, For, Index, onCleanup, onMount, Show} from "solid-js";
 import {COLOURS, HIGHLIGHT_COLOURS} from "./colours";
-import {Board, Group, PuzzleData, serialise, validatePuzzleSolution, winnerFor} from "./puzzle";
+import {Board, Group, isConnected, PuzzleData, serialise, validatePuzzleSolution, winnerFor} from "./puzzle";
 import {Use} from "./svgUtil";
 import CheatWorker from "./workers/cheatWorker?worker";
 
@@ -616,7 +616,7 @@ function shouldColourWarn(thisGroup: Group, groups: Group[], board: Board): bool
     if (!thisGroup || thisGroup.length == 0) {
         return false;
     }
-    if (thisGroup.some(([x, y]) => !thisGroup.some(([a, b]) => Math.abs(x - a) + Math.abs(y - b) == 1)) && thisGroup.length != 1) {
+    if (!isConnected(thisGroup)) {
         return true;
     }
     if (winnerFor(board, thisGroup) == null) {
