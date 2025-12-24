@@ -619,6 +619,9 @@ function shouldColourWarn(thisGroup: Group, groups: Group[], board: Board): bool
     if (thisGroup.some(([x, y]) => !thisGroup.some(([a, b]) => Math.abs(x - a) + Math.abs(y - b) == 1)) && thisGroup.length != 1) {
         return true;
     }
+    if (winnerFor(board, thisGroup) == null) {
+        return true;
+    }
     let mostCommonCellsInGroup: Record<number, number> = {};
     for (let i of groups) {
         if (i.length == 0) {
@@ -626,9 +629,6 @@ function shouldColourWarn(thisGroup: Group, groups: Group[], board: Board): bool
         }
         mostCommonCellsInGroup[i.length] ??= 0;
         mostCommonCellsInGroup[i.length]++;
-        if (winnerFor(board, i) == null) {
-            return true;
-        }
     }
     let mostCommon = Object.entries(mostCommonCellsInGroup).reduce(
         ([as, ac], [b, bc]): [number[], number] => ac > bc
