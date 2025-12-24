@@ -1,4 +1,4 @@
-import {ArrowBack, ArrowForward, HelpOutline} from "@suid/icons-material";
+import {ArrowBack, ArrowForward, Colorize as Eyedropper, HelpOutline} from "@suid/icons-material";
 import {Alert, Box, Button, Card, CircularProgress, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton, ToggleButton, Toolbar, useTheme} from "@suid/material";
 import {createEffect, createResource, createSignal, For, Index, onCleanup, onMount, Show} from "solid-js";
 import {COLOURS, HIGHLIGHT_COLOURS} from "./colours";
@@ -281,7 +281,7 @@ export function PlayPuzzle(props: PlayPuzzleProps) {
         {initialValue: []},
     );
 
-    const [highlightMode, setHighlightMode] = createSignal<'erase' | 'draw'>('draw');
+    const [highlightMode, setHighlightMode] = createSignal<'erase' | 'draw' | 'none'>('draw');
 
     const [cheatOpen, setCheatOpen] = createSignal(false);
 
@@ -315,6 +315,8 @@ export function PlayPuzzle(props: PlayPuzzleProps) {
             ]);
         }
     });
+
+    const [eyedropperActive, setEyedropperActive] = createSignal(false);
 
     const groupVotes = () => groups()
         .map(group => winnerFor(props.data.board, group))
@@ -379,11 +381,29 @@ export function PlayPuzzle(props: PlayPuzzleProps) {
                 groups={groups()}
                 puzzleColours={props.puzzleColours}
                 startHighlight={(x, y) => {
-                    setHighlightMode(
-                        groups()[activeGroup()].some(([gx, gy]) => gx == x && gy == y) ? 'erase' : 'draw'
-                    );
+                    if (eyedropperActive()) {
+                        setHighlightMode('none');
+                        let group = groups()
+                            .map((v, i) => [v, i] as const)
+                            .filter(([group]) => group.some(
+                                ([cx, cy]) => cx == x && cy == y)
+                            )[0]?.[1];
+                        if (group !== undefined) {
+                            setActiveGroup(group);
+                            setEyedropperActive(false);
+                        }
+                    } else {
+                        setHighlightMode(
+                            groups()[activeGroup()].some(([gx, gy]) => gx == x && gy == y)
+                                ? 'erase'
+                                : 'draw'
+                        );
+                    }
                 }}
                 highlightSquare={(x, y) => {
+                    if (highlightMode() == 'none') {
+                        return;
+                    }
                     setGroups(groups => groups.map((group, i) => (
                         highlightMode() == 'erase' || i != activeGroup()
                             ? group.filter(([gx, gy]) => gx != x || gy != y)
@@ -397,6 +417,8 @@ export function PlayPuzzle(props: PlayPuzzleProps) {
                 setGroup={setActiveGroup}
                 groups={groups()}
                 board={props.data.board}
+                eyedropperActive={eyedropperActive()}
+                toggleEyedropper={() => setEyedropperActive(active => !active)}
             />
         </Box>
         <Toolbar sx={{gap: 2}}>
@@ -433,6 +455,8 @@ interface GroupSelectorProps {
     groups: Group[];
     setGroup: (group: number) => void;
     board: Board;
+    eyedropperActive: boolean;
+    toggleEyedropper: () => void;
 }
 function GroupSelector(props: GroupSelectorProps) {
     const [page, setPage] = createSignal(Math.floor(props.activeGroup / 10));
@@ -596,7 +620,15 @@ function GroupSelector(props: GroupSelectorProps) {
                     </Show>
                 </IconButton>
                 <For each={[0, 1, 2, 3, 4, 5, 6, 7, 8, null, 9]}>{(i) => (
-                    <Show when={i !== null} fallback={<IconButton disabled />}>
+                    <Show when={i !== null} fallback={
+                        <ToggleButton
+                            value="eyedropper"
+                            selected={props.eyedropperActive}
+                            onChange={props.toggleEyedropper}
+                        >
+                            <Eyedropper />
+                        </ToggleButton>
+                    }>
                         <ToggleButton
                             value={i! + page() * 10}
                             selected={i! + page() * 10 == props.activeGroup}
