@@ -6,7 +6,12 @@ import {Board, Group, isConnected, PuzzleData, serialise, validatePuzzleSolution
 import {Use} from "./svgUtil";
 import CheatWorker from "./workers/cheatWorker?worker";
 
-const PATTERNS = ["semi-transparent", "ur", "dr", "x"];
+const PATTERNS = [
+    "ur",
+    "dr",
+    "x",
+    "semi-transparent",
+];
 
 interface PuzzleViewProps {
     board: Board;
