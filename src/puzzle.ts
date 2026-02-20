@@ -49,7 +49,12 @@ function choosePuzzleParams(random: Random): [[number, number], number] {
     const difficulty = weightedChoice(difficultyWeights, random);
     const sizeX = select(sizesByDifficulty[difficulty], random);
     const sizeY = select(sizesByDifficulty[difficulty], random);
-    const nColours = weightedChoice(colourWeightsByDifficulty[difficulty], random) + 1;
+    let nColours = weightedChoice(colourWeightsByDifficulty[difficulty], random) + 1;
+    console.log(sizeX, sizeY, nColours);
+    if (sizeX == 4 && sizeY == 4) {
+        // 4x4;2 puzzles are trivial; if we generate a 4x4, force it to be a minimum of 3 colours
+        nColours = Math.max(nColours, 3);
+    }
     return [[sizeX, sizeY], nColours];
 }
 
@@ -186,6 +191,9 @@ function optimiseMinorityCells(totalCells: number, nColours: number): [number, n
     let minMinorityCells = Array(nColours).fill(Infinity);
     let groups = 0, cellsPerGroup = 0;
     for (let [a, b] of factorPairs(totalCells)) {
+        if (a == 1 || a == 2 || b == 1 || b == 2) {
+            continue;
+        }
         let minorityCells = optimiseMinorityCellsForGroups(a, b, nColours);
         for (let i = 0; i < nColours; i++) {
             if (minorityCells[i] < minMinorityCells[i]) {
