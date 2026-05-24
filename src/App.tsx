@@ -51,14 +51,6 @@ export default function App() {
             setTemporaryDrawerOpen(false);
         }
     });
-    let updateAnimationFrame: (() => void) | undefined;
-    let needAnimationFrame = false;
-    function runUpdate() {
-        updateAnimationFrame?.();
-        if (needAnimationFrame && updateAnimationFrame) {
-            requestAnimationFrame(runUpdate);
-        }
-    }
     const [timeUntilNextDaily, setTimeUntilNextDaily] = createSignal(0);
     let handle = setInterval(() => {
         let now: number = new Date() as any;
@@ -321,11 +313,6 @@ export default function App() {
                 transition: "margin-left 225ms cubic-bezier(0, 0, 0.2, 1)",
                 "margin-left": drawerIsPersistent() && persistentDrawerOpen() ? '240px' : '0px',
             }}
-            onTransitionStart={() => {
-                needAnimationFrame = true;
-                runUpdate();
-            }}
-            onTransitionEnd={() => needAnimationFrame = false}
         >
             <Switch>
                 <Match when={page() == "play"}>
